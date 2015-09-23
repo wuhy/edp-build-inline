@@ -39,3 +39,5 @@ edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build)的一个�
         ]
     };
 ```
+
+更多内联选项 `inlineOption` 参考[inline-resource](https://github.com/wuhy/inline-resource)。
