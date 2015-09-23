@@ -3,7 +3,7 @@ edp-build-inline
 
 > EDP Build plugin for inline resource
 
-edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build)的一个插件，用于内联静态资源，支持图片、脚本、样式等。
+edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build) 的一个插件，用于内联静态资源，支持图片、脚本、样式等。
 
 ## 如何使用
 
@@ -40,4 +40,4 @@ edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build)的一个�
     };
 ```
 
-更多内联选项 `inlineOption` 参考[inline-resource](https://github.com/wuhy/inline-resource)。
+更多内联选项 `inlineOption` 参考 [inline-resource](https://github.com/wuhy/inline-resource) 。
