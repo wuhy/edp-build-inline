@@ -1,0 +1,22 @@
+{
+  "name": "edp-build-inline",
+  "version": "0.1.0",
+  "description": "Auto inline css/html/img/svg etc. processor for edp build",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wuhy/edp-build-inline.git"
+  },
+  "keywords": [
+    "edp",
+    "inline"
+  ],
+  "author": "sparklewhy@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "inline-resource": "file:../inline-resource"
+  }
+}
