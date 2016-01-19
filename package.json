@@ -17,6 +17,6 @@
   "author": "sparklewhy@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "inline-resource": "file:../inline-resource"
+    "inline-resource": "^0.1.1"
   }
 }
