@@ -7,8 +7,17 @@ edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build) 的一个�
 
 ## 如何使用
 
+```css
+.icon {
+    /* 使用查询参数方式指定要内联的图片 */
+    background: url(img/loading.gif?_inline)
+}
+```
+
 ```javascript
     var InlineProcessor = require('edp-build-inline');
+    
+    // 复杂自定义任务
     var escapeTask = function (file) {
         return file.data.replace(/\{|\}/g, function (match) {
             return {'{': '{ldelim}', '}': '{rdelim}'}[match];
@@ -20,14 +29,25 @@ edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build) 的一个�
             js: escapeTask,
             css: escapeTask
         },
-        img: false,
         inlineOption: {
+            img: true,
             inlinePathGetter: function (path) {
                 var newPath = path.replace(/\{\$host\}\//, '');
                 return {path: newPath, dir: '.'};
             }
         }
     });
+    
+    // 简单：只对样式图片内联
+    var inlineProcessor = new InlineProcessor({
+        files: ['src/main.css'],
+        inlineOption: {
+            img: {
+                limit: 1024 * 5 // 小于 5kb 图片才内联
+            }
+        }
+    });
+        
     return {
         'default': [
             lessProcessor, moduleProcessor, inlineProcessor, pathMapperProcessor
@@ -35,7 +55,7 @@ edp-build-inlnie 是 [edp-build](https://github.com/ecomfe/edp-build) 的一个�
 
         'release': [
             lessProcessor, cssProcessor, moduleProcessor,
-            jsProcessor, pathMapperProcessor, addCopyright
+            jsProcessor, inlineProcessor, pathMapperProcessor, addCopyright
         ]
     };
 ```
