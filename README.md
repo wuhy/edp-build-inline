@@ -20,11 +20,35 @@ npm install edp-build-inline
     var InlineProcessor = require('edp-build-inline');
     
     // 对样式图片内联
-    var inlineProcessor = new InlineProcessor({
+    var inlineImgProcessor = new InlineProcessor({
         files: ['src/main.css'],
         inlineOption: {
             img: {
                 limit: 1024 * 5 // 小于 5kb 图片才内联
+            }
+        }
+    });
+    
+    // 内联样式
+    var inlineCsser = new InlineProcessor({
+        files: ['views/**/*.tpl'],
+        inlineOption: {
+            inlineAll: true,
+            inlinePathResolver: function (path, file) {
+                if (path.match(/-\w{8}(\.\w+)($|\?|#)/)) {
+                    var originPath = path.replace(/-\w{8}(\.\w+)($|\?|#)/, '$1$2');
+                    originPath = originPath.replace('{%$feRoot%}', 'src');
+                    return {path: originPath, dir: '.'};
+                }
+                return path;
+            },
+            css: {
+                rebase: {
+                    absolute: true,
+                    ignore: function (url) {
+                        return (url.indexOf('{%$feRoot%}') !== -1);
+                    }
+                }
             }
         }
     });
