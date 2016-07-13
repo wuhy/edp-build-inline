@@ -35,7 +35,7 @@ exports.getProcessors = function () {
         },
         img: false,
         inlineOption: {
-            inlinePathGetter: function (path) {
+            inlinePathResolver: function (path) {
                 var newPath = path.replace(/\{\$host\}\//, '');
                 return {path: newPath, dir: '.'};
             }

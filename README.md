@@ -23,7 +23,7 @@ npm install edp-build-inline
     var inlineImgProcessor = new InlineProcessor({
         files: ['src/main.css'],
         inlineOption: {
-            img: {
+            img: { // 内联的图片需要通过内联查询参数指定，具体参考 `inlineAll` 选项说明
                 limit: 1024 * 5 // 小于 5kb 图片才内联
             }
         }
@@ -33,10 +33,11 @@ npm install edp-build-inline
     var inlineCsser = new InlineProcessor({
         files: ['views/**/*.tpl'],
         inlineOption: {
-            inlineAll: true,
-            inlinePathResolver: function (path, file) {
+            inlineAll: true, // 要内联的 css 资源不需要通过内联查询参数指定，具体参考下面`inlineAll`选项说明
+            inlinePathResolver: function (path, file) { // 重新计算内联的文件路径
                 if (path.match(/-\w{8}(\.\w+)($|\?|#)/)) {
                     var originPath = path.replace(/-\w{8}(\.\w+)($|\?|#)/, '$1$2');
+                    // 替换内联文件路径包含的变量
                     originPath = originPath.replace('{%$feRoot%}', 'src');
                     return {path: originPath, dir: '.'};
                 }
@@ -71,7 +72,7 @@ npm install edp-build-inline
 
 * files - `Array.<string|RegExp>` `optional` 要替换处理的文件，默认 `['*.css', '*.html', '*.tpl', '!dep/**/*']`
 
-* inlineOption - `Object` 内联选项，更多内联选项参考 [inline-resource](https://github.com/wuhy/inline-resource) 
+* inlineOption - `Object` 内联选项，更多内联选项 和 内联规则参考 [inline-resource](https://github.com/wuhy/inline-resource) 
 
     * css - `boolean|Object` `optional` 是否内联样式文件
     
@@ -98,12 +99,43 @@ npm install edp-build-inline
       
       ```javascript
       js: {
-          // 是否使用定制的内联方法，默认 false
+          // 是否使用定制的内联方法: `__inline('resource path')`
+          // 默认 false，要使用自定义的内联方法，设为 true
           // e.g., var tpl = '__inline("./a.tpl")'; // output: var tpl = '<inline tpl content>'
           // '__inline("./a.js")' // output: <inline js file content>
           custom: false
       }
       ``` 
+
+      ```javascript
+        /**
+         * 使用自定义内联方法示例
+         */
+        var tpl = '__inline(\'./inline.tpl\')';
+
+        var css = '__inline("./inline.css")';
+
+        // inline image
+        var img = "__inline(\"../img/bookmark.png\")";
+        
+        // inline js file
+        '__inline("./inline.js")';
+      ```
+
+      ```javascript
+        /**
+         * 使用自定义内联方法，处理后的输出示例
+         */
+        var tpl = '<inline tpl file content>';
+
+        var css = '<inline css file content>';
+          
+        // inline image
+        var img = '<inline img base64 content>';
+
+        // inline js file
+        <inline js file content>;
+      ```
     
     * html - `boolean|Object` `optional` 是否内联 html
     
@@ -119,10 +151,10 @@ npm install edp-build-inline
     * font - `boolean|Object` `optional` 是否内联字体文件
         
         ```javascript
-            font: {
-                // 当字体文件大小 <= 1024byte 才进行内联
-                limit: 1024
-            }
+        font: {
+            // 当字体文件大小 <= 1024byte 才进行内联
+            limit: 1024
+        }
         ```
     
     * svg - `boolean|Object` `optional` 是否内联 svg 文件，默认使用 base64 编码内联   
@@ -137,41 +169,36 @@ npm install edp-build-inline
             limit: 1024,
         }
         ```
-    * inlinePathResolver - `Function` `optional` 重新计算内联文件路径       
+    * inlinePathResolver - `Function` `optional` 重新计算内联文件路径，有时候内联路径可能包含变量或者基于当前路径没法正确计算出内联路径，可以通过该选项重新计算正确的内联文件路径      
     
         ```javascript
-        {
-            inlinePathResolver: function (path, file) {
-                return path.replace(/{%site_host%}\//, '');
-                
-                // 指定返回的路径相对的目录
-                // return {path: path, dir: '.'};
-            }
+        inlinePathResolver: function (path, file) {
+            return path.replace(/{%site_host%}\//, '');
+            
+            // 指定返回的路径相对的目录
+            // return {path: path, dir: '.'};
         }
         ```
     
     * processor - `Object` `optional` 自定义的文件所使用的处理器类型定义，可选
         
          ```javascript
-        {
-            processor: { // 指定特定类型文件使用的处理器类型，key 为文件的扩展名
-                mustache: 'html'
-            },
+        processor: { // 指定特定类型文件使用的处理器类型，key 为文件的扩展名
+            mustache: 'html'
         }
         ```
         
-    * inlineAll - `boolean` `optional` 是否自动内联所有的本地资源，而不是通过指定 url 查询参数方式来进行内联，默认通过查询参数方式指定内联
+    * inlineAll - `boolean` `optional` 是否自动内联所有的本地资源，而不是通过指定 url 查询参数方式来进行内联，默认通过查询参数方式指定内联。对于 `inlineAll` 为 
+    `true`，需要手动指定要全部内联的资源类型，具体通过前面资源类型选项开启，比如 `css: true` or `css: {/*options*/}`
         
         ```javascript
-        {
-            inlineAll: true, // 对于 `inlineAll` 为 true，需要手动指定要全部内联的资源类型
-            css: true,       // 内联所有的 css 资源 
-        }
+        inlineAll: true, // 对于 `inlineAll` 为 true，需要手动指定要全部内联的资源类型
+        css: true,       // 内联所有的 css 资源
         ```
         
         ```css
         .icon {
-            /* 使用查询参数方式指定要内联的图片 */
+            /* 使用查询参数方式指定要内联的图片，默认内联方式，即 inlineAll: false 时候 */
             background: url(img/loading.gif?_inline)
         }
         ```
@@ -195,7 +222,7 @@ npm install edp-build-inline
         },
         inlineOption: {
             img: true,
-            inlinePathGetter: function (path) {
+            inlinePathResolver: function (path) {
                 var newPath = path.replace(/\{\$host\}\//, '');
                 return {path: newPath, dir: '.'};
             }
